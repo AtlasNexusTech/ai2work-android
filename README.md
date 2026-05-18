@@ -6,7 +6,7 @@ The app loads the live web app — no rebuild needed when the site updates.
 
 ## Download APK
 
-👉 [**Download latest APK**](https://github.com/AtlasNexusOps/ai2work-android/actions/workflows/build-apk.yml?query=branch%3Amain+is%3Asuccess) — click the latest run → scroll to **Artifacts** → `ai2work-debug`
+👉 [**Télécharger l'APK**](https://nightly.link/AtlasNexusOps/ai2work-android/workflows/build-apk/main/ai2work-debug) — lien direct, sans login GitHub
 
 ## Quick Start
 
