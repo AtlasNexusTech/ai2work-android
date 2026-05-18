@@ -4,6 +4,10 @@ Native Android wrapper for [AI2Work](https://ai2work.onrender.com) built with Ca
 
 The app loads the live web app — no rebuild needed when the site updates.
 
+## Download APK
+
+👉 [**Download latest APK**](https://github.com/AtlasNexusOps/ai2work-android/actions/workflows/build-apk.yml?query=branch%3Amain+is%3Asuccess) — click the latest run → scroll to **Artifacts** → `ai2work-debug`
+
 ## Quick Start
 
 ```bash
