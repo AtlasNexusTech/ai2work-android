@@ -120,18 +120,19 @@ object EthWalletHelper {
         val q = EC_SPEC.g.multiply(d).normalize()
 
         val kf = KeyFactory.getInstance("EC", BouncyCastleProvider.PROVIDER_NAME)
+        val ecParams = java.security.spec.ECParameterSpec(
+            java.security.spec.EllipticCurve(
+                java.security.spec.ECFieldFp(EC_SPEC.curve.field.characteristic),
+                EC_SPEC.curve.a.toBigInteger(), EC_SPEC.curve.b.toBigInteger()
+            ),
+            java.security.spec.ECPoint(EC_SPEC.g.affineXCoord.toBigInteger(), EC_SPEC.g.affineYCoord.toBigInteger()),
+            EC_SPEC.n, EC_SPEC.h.toInt()
+        )
         val pub = kf.generatePublic(java.security.spec.ECPublicKeySpec(
             java.security.spec.ECPoint(q.affineXCoord.toBigInteger(), q.affineYCoord.toBigInteger()),
-            java.security.spec.ECParameterSpec(
-                java.security.spec.EllipticCurve(
-                    java.security.spec.ECFieldFp(EC_SPEC.curve.field.characteristic),
-                    EC_SPEC.curve.a.toBigInteger(), EC_SPEC.curve.b.toBigInteger()
-                ),
-                java.security.spec.ECPoint(EC_SPEC.g.affineXCoord.toBigInteger(), EC_SPEC.g.affineYCoord.toBigInteger()),
-                EC_SPEC.n, EC_SPEC.h.toInt()
-            )
+            ecParams
         ))
-        val priv = kf.generatePrivate(java.security.spec.ECPrivateKeySpec(d, pub.getParams()))
+        val priv = kf.generatePrivate(java.security.spec.ECPrivateKeySpec(d, ecParams))
         return KeyPair(pub, priv)
     }
 

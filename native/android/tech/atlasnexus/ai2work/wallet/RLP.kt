@@ -8,7 +8,7 @@ object RLP {
     fun bytes(data: ByteArray): ByteArray {
         if (data.isEmpty()) return byteArrayOf(0x80.toByte())
         if (data.size == 1 && (data[0].toInt() and 0xFF) < 0x80) return data
-        return lenPrefix(data.size, 0x80.toByte()) + data
+        return lenPrefix(data.size, 0x80) + data
     }
 
     fun long(v: Long): ByteArray = bigint(BigInteger.valueOf(v))
