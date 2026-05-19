@@ -4,6 +4,11 @@ import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
+import org.bouncycastle.crypto.params.ECDomainParameters
+import org.bouncycastle.crypto.params.ECPrivateKeyParameters
+import org.bouncycastle.crypto.signers.ECDSASigner
+import org.bouncycastle.crypto.signers.HMacDSAKCalculator
+import org.bouncycastle.crypto.digests.SHA256Digest
 import org.bouncycastle.jce.ECNamedCurveTable
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec
@@ -15,12 +20,6 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
-/**
- * Android-native Ethereum wallet backed by hardware Keystore (AES-256/GCM).
- *
- * Key derivation: secp256k1 → Keystore-encrypted private key → uncompressed pubkey → keccak256 → address.
- * Signing: ECDSA deterministic (RFC 6979 via BouncyCastle).
- */
 object EthWalletHelper {
     private const val ANDROID_KEYSTORE = "AndroidKeyStore"
     private const val ENC_KEY_ALIAS = "ai2work_wallet_aes"
@@ -28,6 +27,7 @@ object EthWalletHelper {
     private const val PREF_KEY = "enc_key"
 
     private val EC_SPEC: ECNamedCurveParameterSpec = ECNamedCurveTable.getParameterSpec("secp256k1")
+    private val EC_DOMAIN = ECDomainParameters(EC_SPEC.curve, EC_SPEC.g, EC_SPEC.n, EC_SPEC.h)
     private val CURVE_N: BigInteger = EC_SPEC.n
     private val HALF_N: BigInteger = CURVE_N.shiftRight(1)
 
@@ -38,7 +38,6 @@ object EthWalletHelper {
         Security.insertProviderAt(BouncyCastleProvider(), 1)
     }
 
-    /** Generate a new secp256k1 key → encrypt → store. Returns the 0x-address. */
     fun createWallet(): String {
         val kpg = KeyPairGenerator.getInstance("EC", BouncyCastleProvider.PROVIDER_NAME)
         kpg.initialize(ECGenParameterSpec("secp256k1"))
@@ -72,7 +71,6 @@ object EthWalletHelper {
         } catch (_: Exception) {}
     }
 
-    /** EIP-191 personal_sign */
     fun signMessage(message: String): String {
         val kp = loadKeyPair() ?: throw IllegalStateException("No wallet")
         val prefix = "\u0019Ethereum Signed Message:\n"
@@ -81,7 +79,6 @@ object EthWalletHelper {
         return signDigestWithRecovery(hash, kp.private as org.bouncycastle.jce.interfaces.ECPrivateKey)
     }
 
-    /** EIP-1559 transaction signing — returns hex-encoded raw tx */
     fun signTransaction(
         to: String, value: BigInteger, data: ByteArray,
         nonce: Long, gasLimit: BigInteger,
@@ -91,15 +88,11 @@ object EthWalletHelper {
         val kp = loadKeyPair() ?: throw IllegalStateException("No wallet")
 
         val rlp = RLP.list(
-            RLP.long(chainId),
-            RLP.long(nonce),
-            RLP.bigint(maxPriorityFeePerGas),
-            RLP.bigint(maxFeePerGas),
-            RLP.bigint(gasLimit),
-            RLP.address(to),
-            RLP.bigint(value),
-            RLP.bytes(data),
-            RLP.list() // empty access list
+            RLP.long(chainId), RLP.long(nonce),
+            RLP.bigint(maxPriorityFeePerGas), RLP.bigint(maxFeePerGas),
+            RLP.bigint(gasLimit), RLP.address(to),
+            RLP.bigint(value), RLP.bytes(data),
+            RLP.list()
         )
         val unsigned = byteArrayOf(0x02) + rlp
         val hash = Keccak256.digest(unsigned)
@@ -131,14 +124,14 @@ object EthWalletHelper {
             java.security.spec.ECPoint(q.affineXCoord.toBigInteger(), q.affineYCoord.toBigInteger()),
             java.security.spec.ECParameterSpec(
                 java.security.spec.EllipticCurve(
-                    java.security.spec.ECFieldFp(EC_SPEC.curve.field.p),
+                    java.security.spec.ECFieldFp(EC_SPEC.curve.field.characteristic),
                     EC_SPEC.curve.a.toBigInteger(), EC_SPEC.curve.b.toBigInteger()
                 ),
                 java.security.spec.ECPoint(EC_SPEC.g.affineXCoord.toBigInteger(), EC_SPEC.g.affineYCoord.toBigInteger()),
                 EC_SPEC.n, EC_SPEC.h.toInt()
             )
         ))
-        val priv = kf.generatePrivate(java.security.spec.ECPrivateKeySpec(d, pub.params))
+        val priv = kf.generatePrivate(java.security.spec.ECPrivateKeySpec(d, pub.getParams()))
         return KeyPair(pub, priv)
     }
 
@@ -156,14 +149,12 @@ object EthWalletHelper {
     }
 
     private fun signForRecovery(hash: ByteArray, priv: org.bouncycastle.jce.interfaces.ECPrivateKey): Triple<BigInteger, BigInteger, Byte> {
-        val signer = org.bouncycastle.crypto.signers.ECDSASigner(
-            org.bouncycastle.crypto.signers.HMacDSAKCalculator(org.bouncycastle.crypto.digests.SHA256Digest())
-        )
-        signer.init(true, org.bouncycastle.crypto.params.ECPrivateKeyParameters(priv.d, EC_SPEC))
+        val signer = ECDSASigner(HMacDSAKCalculator(SHA256Digest()))
+        signer.init(true, ECPrivateKeyParameters(priv.d, EC_DOMAIN))
         val comps = signer.generateSignature(hash)
         val r = comps[0] as BigInteger
         var s = comps[1] as BigInteger
-        if (s > HALF_N) s = CURVE_N.subtract(s) // canonical s
+        if (s > HALF_N) s = CURVE_N.subtract(s)
 
         val pubRecover = EC_SPEC.g.multiply(priv.d).normalize()
         var recId: Byte = -1
@@ -171,23 +162,21 @@ object EthWalletHelper {
             val recovered = recoverPubKey(i, r, s, hash)
             if (recovered != null && recovered == pubRecover) { recId = i.toByte(); break }
         }
-        if (recId < 0) recId = 0 // fallback
+        if (recId < 0) recId = 0
         return Triple(r, s, recId)
     }
 
     private fun recoverPubKey(recId: Int, r: BigInteger, s: BigInteger, hash: ByteArray): org.bouncycastle.math.ec.ECPoint? {
         if (recId < 0 || recId > 3) return null
         val curve = EC_SPEC.curve
-        val n = CURVE_N
-        val field = curve.field.p
+        val field = curve.field.characteristic
 
-        val x = if (recId >= 2) r.add(n) else r
+        val x = if (recId >= 2) r.add(CURVE_N) else r
         if (x >= field) return null
 
-        val a = curve.a.toBigInteger()
-        val b = curve.b.toBigInteger()
         val x3 = x.modPow(BigInteger.valueOf(3), field)
-        val ax = a.multiply(x).mod(field)
+        val ax = curve.a.toBigInteger().multiply(x).mod(field)
+        val b = curve.b.toBigInteger()
         val rhs = x3.add(ax).add(b).mod(field)
         val y = rhs.modPow(field.add(BigInteger.ONE).divide(BigInteger.valueOf(4)), field)
         if (y.multiply(y).mod(field) != rhs) return null
@@ -196,7 +185,7 @@ object EthWalletHelper {
         return curve.createPoint(x, yFinal).normalize()
     }
 
-    // ─── AES/GCM via Keystore ───
+    // ─── AES/GCM ───
 
     private fun aesEncrypt(plain: ByteArray): ByteArray {
         val key = getOrCreateAesKey()
@@ -224,8 +213,6 @@ object EthWalletHelper {
             .setKeySize(256).build())
         return kg.generateKey()
     }
-
-    // ─── Helpers ───
 
     private fun padLeft32(b: ByteArray): ByteArray {
         return if (b.size >= 32) b.copyOfRange(b.size - 32, b.size)

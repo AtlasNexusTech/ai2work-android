@@ -2,15 +2,32 @@ package tech.atlasnexus.ai2work.wallet
 
 /** Pure Kotlin Keccak-256 (SHA-3 variant, 256-bit output). */
 object Keccak256 {
+    // Round constants as unsigned, stored in Long (same bit pattern)
     private val RC = longArrayOf(
-        0x0000000000000001L, 0x0000000000008082L, 0x800000000000808AL,
-        0x8000000080008000L, 0x000000000000808BL, 0x0000000080000001L,
-        0x8000000080008081L, 0x8000000000008009L, 0x000000000000008AL,
-        0x0000000000000088L, 0x0000000080008009L, 0x000000008000000AL,
-        0x000000008000808BL, 0x800000000000008BL, 0x8000000000008089L,
-        0x8000000000008003L, 0x8000000000008002L, 0x8000000000000080L,
-        0x000000000000800AL, 0x800000008000000AL, 0x8000000080008081L,
-        0x8000000000008080L, 0x0000000080000001L, 0x8000000080008008L
+        0x0000000000000001L,
+        0x0000000000008082L,
+        -0x7fffffff7fff7f76L, // 0x800000000000808A
+        -0x7fffffff80008000L, // 0x8000000080008000
+        0x000000000000808BL,
+        0x0000000080000001L,
+        -0x7fffffff7fff7f7fL, // 0x8000000080008081
+        -0x7fffffffffff7ff7L, // 0x8000000000008009
+        0x000000000000008AL,
+        0x0000000000000088L,
+        0x0000000080008009L,
+        0x000000008000000AL,
+        0x000000008000808BL,
+        -0x7fffffffffff7f75L, // 0x800000000000008B
+        -0x7fffffffffff7f77L, // 0x8000000000008089
+        -0x7fffffffffff7ffdL, // 0x8000000000008003
+        -0x7fffffffffff7ffeL, // 0x8000000000008002
+        -0x7fffffffffff7f80L, // 0x8000000000000080
+        0x000000000000800AL,
+        -0x7fffffff80007ff6L, // 0x800000008000000A
+        -0x7fffffff7fff7f7fL, // 0x8000000080008081
+        -0x7fffffffffff7f80L, // 0x8000000000008080
+        0x0000000080000001L,
+        -0x7fffffff80007ff8L  // 0x8000000080008008
     )
     private val ROT = intArrayOf(
         1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 2, 14,
@@ -22,29 +39,25 @@ object Keccak256 {
         val buf = ByteArray(136)
         var pos = 0
 
-        // Absorb
         for (byte in input) {
             buf[pos++] = byte
-            if (pos == 136) {
-                absorbBlock(state, buf)
-                pos = 0
-            }
+            if (pos == 136) { absorbBlock(state, buf); pos = 0 }
         }
-        // Padding
         buf[pos] = 0x01.toByte()
         for (i in pos + 1 until 135) buf[i] = 0
         buf[135] = (buf[135].toInt() xor 0x80).toByte()
         absorbBlock(state, buf)
 
-        // Squeeze
         val out = ByteArray(32)
         var outPos = 0
         while (outPos < 32) {
             keccakF(state)
-            val bytes = longArrayToBytes(state).take(136 - outPos.coerceAtMost(136))
-            for (b in bytes) {
+            for (v in state) {
+                for (i in 0 until 8) {
+                    if (outPos >= 32) break
+                    out[outPos++] = ((v ushr (8 * i)) and 0xFF).toByte()
+                }
                 if (outPos >= 32) break
-                out[outPos++] = b
             }
         }
         return out
@@ -74,8 +87,8 @@ object Keccak256 {
             var cur = a[1]
             var cx = 0; var cy = 1
             for (t in 0 until 24) {
-                val nx = (cx + 3 * cy) % 5
-                val ny = cx
+                val nx = cy
+                val ny = (2 * cx + 3 * cy) % 5
                 val tmp = a[nx + 5 * ny]
                 a[nx + 5 * ny] = java.lang.Long.rotateLeft(cur, ROT[t])
                 cur = tmp
@@ -91,13 +104,5 @@ object Keccak256 {
             // Iota
             a[0] = a[0] xor RC[round]
         }
-    }
-
-    private fun longArrayToBytes(state: LongArray): List<Byte> {
-        val out = mutableListOf<Byte>()
-        for (v in state) {
-            for (i in 0 until 8) out.add(((v ushr (8 * i)) and 0xFF).toByte())
-        }
-        return out
     }
 }
