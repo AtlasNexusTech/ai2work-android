@@ -12,6 +12,14 @@ const config: CapacitorConfig = {
     allowMixedContent: true,
     webContentsDebuggingEnabled: false,
   },
+  plugins: {
+    SplashScreen: {
+      launchShowDuration: 0,
+      launchAutoHide: true,
+      backgroundColor: "#0B1120",
+      showSpinner: false,
+    },
+  },
 };
 
 export default config;
