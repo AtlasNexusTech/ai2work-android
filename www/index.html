@@ -5,509 +5,375 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover,user-scalable=no">
 <title>AI2Work</title>
 <style>
-  /* ══════════════════════════════════════════
-     ATLAS DESIGN SYSTEM v3 — 2030-ready
-     Glass · Typography · Spatial · Fluid
-     ══════════════════════════════════════════ */
-
   :root {
-    --bg: #000000;
-    --surface: #0d0d0d;
-    --surface-raised: #141414;
-    --glass: rgba(255,255,255,.04);
+    --bg: #000;
+    --sheet: rgba(18,18,18,.88);
+    --glass: rgba(255,255,255,.03);
     --glass-border: rgba(255,255,255,.06);
-    --glass-hover: rgba(255,255,255,.06);
-    --text: #f5f5f5;
-    --text-secondary: #a0a0a0;
-    --text-tertiary: #606060;
+    --text: #fafafa;
+    --text-secondary: #a1a1a1;
+    --text-dim: #555;
     --accent: #3b82f6;
-    --accent-soft: rgba(59,130,246,.12);
-    --accent-glow: rgba(59,130,246,.3);
+    --accent-dim: rgba(59,130,246,.2);
+    --accent-glow: rgba(59,130,246,.35);
     --green: #22c55e;
-    --green-soft: rgba(34,197,94,.12);
-    --red: #ef4444;
-    --orange: #f59e0b;
-    --radius: 20px;
-    --radius-sm: 14px;
-    --radius-btn: 100px;
+    --green-dim: rgba(34,197,94,.15);
+    --radius: 24px;
+    --radius-sm: 16px;
     --font: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-    --font-mono: 'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
-    --nav-height: 88px;
-    --header-height: 60px;
-    --transition: cubic-bezier(.22,1,.36,1);
+    --font-mono: 'SF Mono', 'JetBrains Mono', monospace;
+    --ease: cubic-bezier(.22,1,.36,1);
+    --ease-out: cubic-bezier(0,0,.2,1);
   }
-
   [data-theme="light"] {
-    --bg: #f8f8f8;
-    --surface: #ffffff;
-    --surface-raised: #f5f5f5;
-    --glass: rgba(0,0,0,.02);
-    --glass-border: rgba(0,0,0,.06);
-    --glass-hover: rgba(0,0,0,.03);
+    --bg: #f2f2f7;
+    --sheet: rgba(255,255,255,.92);
+    --glass: rgba(0,0,0,.015);
+    --glass-border: rgba(0,0,0,.05);
     --text: #0a0a0a;
-    --text-secondary: #6e6e6e;
-    --text-tertiary: #b0b0b0;
-    --accent-soft: rgba(59,130,246,.08);
-    --green-soft: rgba(34,197,94,.08);
+    --text-secondary: #666;
+    --text-dim: #bbb;
+    --accent-dim: rgba(59,130,246,.08);
   }
 
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent }
-  html { height:100dvh; overflow:hidden }
+  html { height:100dvh; overflow:hidden; background:var(--bg) }
   body {
-    font-family: var(--font);
-    background: var(--bg);
-    color: var(--text);
-    height: 100dvh; overflow: hidden;
-    display: flex; flex-direction: column;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    user-select: none;
-    transition: background .5s var(--transition);
+    font-family:var(--font); background:var(--bg); color:var(--text);
+    height:100dvh; overflow:hidden; display:flex; flex-direction:column;
+    -webkit-font-smoothing:antialiased; user-select:none;
+    transition:background .6s var(--ease);
   }
 
-  /* ── Header ── */
-  header {
-    height: var(--header-height);
-    padding: 0 20px;
-    display: flex; align-items: center; justify-content: space-between;
-    flex-shrink: 0;
-    position: relative; z-index: 20;
+  /* ── Ambient orbs ── */
+  .ambient-orbs { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden }
+  .orb {
+    position:absolute; border-radius:50%; filter:blur(120px); opacity:.3;
+    animation: orbFloat 20s ease-in-out infinite;
   }
-  .logo {
-    font-size: 22px; font-weight: 700; letter-spacing: -0.6px;
-    display: flex; align-items: baseline; gap: 1px;
+  .orb-1 { width:300px;height:300px;background:var(--accent);top:10%;left:-10%;animation-delay:0s }
+  .orb-2 { width:250px;height:250px;background:#8b5cf6;top:60%;right:-5%;animation-delay:-7s }
+  .orb-3 { width:200px;height:200px;background:var(--green);top:30%;left:60%;animation-delay:-14s }
+  @keyframes orbFloat {
+    0%,100% { transform:translate(0,0) scale(1) }
+    25% { transform:translate(40px,-30px) scale(1.15) }
+    50% { transform:translate(-20px,20px) scale(.9) }
+    75% { transform:translate(-30px,-10px) scale(1.1) }
   }
-  .logo-mark { color: var(--accent) }
-  .header-btn {
-    width: 38px; height: 38px; border-radius: 50%;
-    border: 1px solid var(--glass-border); background: var(--glass);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: all .2s var(--transition);
-    color: var(--text-secondary);
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  }
-  .header-btn:active { background: var(--glass-hover); transform: scale(.94) }
 
-  /* ── Main ── */
-  main {
-    flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
-    padding: 8px 16px 20px;
-    scroll-behavior: smooth;
-    position: relative; z-index: 10;
-  }
-  main::-webkit-scrollbar { display:none }
+  /* ── Main scroll ── */
+  .scroll-view { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; position:relative; z-index:1; padding-bottom:120px }
+  .scroll-view::-webkit-scrollbar { display:none }
 
-  /* ── Bottom Nav (floating pill) ── */
-  .nav-container {
-    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-    z-index: 100; width: calc(100% - 32px); max-width: 400px;
-    padding-bottom: env(safe-area-inset-bottom, 0);
-  }
-  nav#bottomNav {
-    display: flex; align-items: center; justify-content: space-around;
-    background: var(--surface); border: 1px solid var(--glass-border);
-    border-radius: 100px; padding: 6px;
-    box-shadow: 0 8px 40px rgba(0,0,0,.4), 0 2px 8px rgba(0,0,0,.2);
-    backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-  }
-  .nav-item {
-    flex:1; display:flex; flex-direction:column; align-items:center; gap:2px;
-    cursor:pointer; padding: 10px 6px 8px; border-radius: 100px;
-    transition: all .3s var(--transition); position: relative;
-    color: var(--text-tertiary); font-size: 10px; font-weight: 500;
-    letter-spacing: 0.2px;
-  }
-  .nav-item svg { width: 22px; height: 22px; transition: transform .3s var(--transition) }
-  .nav-item.active {
-    color: var(--accent);
-    background: var(--accent-soft);
-  }
-  .nav-item.active svg { transform: translateY(-1px) }
-  .nav-item:active { transform: scale(.94) }
+  /* ── Hero ── */
+  .hero { padding:40px 24px 20px; position:relative; z-index:2 }
+  .hero-eyebrow { font-size:11px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:12px }
+  .hero-title { font-size:clamp(48px,12vw,72px); font-weight:900; letter-spacing:-3px; line-height:.92; margin-bottom:16px }
+  .hero-gradient { background:linear-gradient(180deg, var(--text) 0%, var(--text-dim) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text }
+  .hero-desc { font-size:17px; color:var(--text-secondary); line-height:1.5; max-width:320px }
 
-  /* ── Glass Card ── */
-  .glass-card {
-    background: var(--surface);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius);
-    padding: 20px; margin-bottom: 14px;
-    position: relative; overflow: hidden;
-    transition: all .3s var(--transition);
+  /* ── Carousel horizontal ── */
+  .carousel-section { margin:24px 0; position:relative; z-index:2 }
+  .carousel-label { padding:0 24px; font-size:13px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--text-secondary); margin-bottom:12px; display:flex; align-items:center; justify-content:space-between }
+  .carousel-track { display:flex; gap:12px; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; padding:0 24px; scrollbar-width:none }
+  .carousel-track::-webkit-scrollbar { display:none }
+  .carousel-card {
+    min-width:280px; max-width:320px; scroll-snap-align:start;
+    background:var(--glass); border:1px solid var(--glass-border);
+    border-radius:var(--radius); padding:24px; flex-shrink:0;
+    backdrop-filter:blur(40px); -webkit-backdrop-filter:blur(40px);
+    transition:transform .3s var(--ease), border-color .3s var(--ease);
+    cursor:pointer;
   }
-  .glass-card::before {
-    content:''; position:absolute; inset:0;
-    background: radial-gradient(ellipse at 50% 0%, var(--accent-soft), transparent 70%);
-    opacity: 0; transition: opacity .4s var(--transition);
-    pointer-events: none;
-  }
-  .glass-card:active::before { opacity: 1 }
-  .glass-card:active { transform: scale(.985); border-color: rgba(255,255,255,.08) }
-
-  /* ── Hero card ── */
-  .hero-card {
-    background: var(--surface);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius);
-    padding: 28px 24px; margin-bottom: 20px;
-    position: relative; overflow: hidden;
-  }
-  .hero-card::after {
-    content:''; position:absolute; top:-40%; right:-20%;
-    width: 200px; height: 200px;
-    background: radial-gradient(circle, var(--accent-glow), transparent 70%);
-    pointer-events: none; opacity: .5;
-  }
-  .hero-amount {
-    font-size: 48px; font-weight: 800; letter-spacing: -2px;
-    line-height: 1; margin-bottom: 6px;
-    background: linear-gradient(135deg, #fff 0%, #888 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  [data-theme="light"] .hero-amount {
-    background: linear-gradient(135deg, #0a0a0a 0%, #555 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .hero-label { font-size: 13px; color: var(--text-secondary); font-weight: 500; letter-spacing: .5px; text-transform: uppercase }
-
-  /* ── Stats row ── */
-  .stats-row { display:flex; gap:10px; margin-bottom:20px }
-  .stat-card {
-    flex:1; background: var(--surface);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-sm);
-    padding: 16px; text-align: center;
-    transition: all .3s var(--transition);
-  }
-  .stat-card:active { background: var(--surface-raised); transform: scale(.97) }
-  .stat-value { font-size: 26px; font-weight: 700; letter-spacing: -1px }
-  .stat-label { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; font-weight: 500; letter-spacing: .3px }
-
-  /* ── Bounty row ── */
-  .bounty-row {
-    display: flex; align-items: center; gap: 14px;
-    padding: 16px 0; border-bottom: 1px solid var(--glass-border);
-    cursor: pointer; transition: opacity .2s;
-  }
-  .bounty-row:last-child { border-bottom:none }
-  .bounty-row:active { opacity:.6 }
-  .bounty-avatar {
-    width:46px;height:46px;border-radius:var(--radius-sm);
+  .carousel-card:active { transform:scale(.96) }
+  .carousel-card .c-icon {
+    width:48px;height:48px;border-radius:var(--radius-sm);
     display:flex;align-items:center;justify-content:center;
-    font-size:18px;font-weight:600;flex-shrink:0;
-    letter-spacing: -0.5px;
+    font-size:20px;font-weight:700;margin-bottom:16px;
   }
-  .bounty-body { flex:1; min-width:0 }
-  .bounty-name { font-size:15px; font-weight:600; margin-bottom:2px; white-space:nowrap;overflow:hidden;text-overflow:ellipsis }
-  .bounty-tags { display:flex;gap:6px }
-  .bounty-price { font-weight:700; font-size:17px; text-align:right; white-space:nowrap; flex-shrink:0; letter-spacing:-0.5px }
+  .carousel-card .c-title { font-size:18px;font-weight:700;letter-spacing:-.5px;margin-bottom:6px }
+  .carousel-card .c-meta { font-size:13px;color:var(--text-secondary);margin-bottom:12px }
+  .carousel-card .c-price { font-size:24px;font-weight:800;letter-spacing:-1px }
+  .carousel-card .c-tag { display:inline-block;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:.5px;margin-top:8px;
+    background:var(--accent-dim);color:var(--accent) }
 
-  /* ── Tags ── */
-  .tag {
-    display:inline-block; padding:3px 8px; border-radius:6px;
-    font-size:10px; font-weight:600; letter-spacing:.3px;
+  /* ── Stats pills ── */
+  .stats-pills { display:flex;gap:10px;padding:0 24px;margin:20px 0;overflow-x:auto;scrollbar-width:none }
+  .stats-pills::-webkit-scrollbar { display:none }
+  .stat-pill {
+    display:flex;align-items:center;gap:10px;padding:12px 18px;
+    background:var(--glass);border:1px solid var(--glass-border);
+    border-radius:100px;white-space:nowrap;flex-shrink:0;
+    backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);
+    cursor:pointer;transition:all .25s var(--ease);
   }
-  .tag-blue { background:var(--accent-soft); color:var(--accent) }
-  .tag-green { background:var(--green-soft); color:var(--green) }
+  .stat-pill:active { background:var(--accent-dim);border-color:var(--accent) }
+  .stat-pill .sp-value { font-size:20px;font-weight:700;letter-spacing:-.5px }
+  .stat-pill .sp-label { font-size:12px;color:var(--text-secondary);font-weight:500 }
+  .stat-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0 }
+  .stat-dot.blue { background:var(--accent);box-shadow:0 0 12px var(--accent-glow) }
+  .stat-dot.green { background:var(--green);box-shadow:0 0 12px rgba(34,197,94,.4) }
+  .stat-dot.amber { background:#f59e0b;box-shadow:0 0 12px rgba(245,158,11,.4) }
 
-  /* ── Buttons ── */
-  .btn {
-    display:inline-flex; align-items:center; justify-content:center; gap:8px;
-    padding: 14px 28px; border-radius: var(--radius-btn); border: none;
-    font-size: 15px; font-weight: 600; cursor: pointer;
-    transition: all .2s var(--transition);
-    letter-spacing: -0.2px;
-    position: relative; overflow: hidden;
+  /* ── Bottom sheet ── */
+  .sheet-overlay {
+    position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.4);
+    opacity:0;pointer-events:none;transition:opacity .35s var(--ease);
+    backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
   }
-  .btn:active { transform: scale(.96) }
-  .btn-primary {
-    background: var(--accent); color: white; width:100%;
-    box-shadow: 0 8px 30px var(--accent-glow);
+  .sheet-overlay.open { opacity:1;pointer-events:auto }
+  .sheet {
+    position:fixed;bottom:0;left:0;right:0;z-index:60;
+    background:var(--sheet);border-radius:28px 28px 0 0;
+    padding:16px 24px 40px;max-height:85dvh;overflow-y:auto;
+    transform:translateY(100%);
+    transition:transform .45s var(--ease-out);
+    border-top:1px solid var(--glass-border);
+    backdrop-filter:blur(50px);-webkit-backdrop-filter:blur(50px);
+    padding-bottom:calc(40px + env(safe-area-inset-bottom, 0));
   }
-  .btn-primary:active { box-shadow: 0 4px 16px var(--accent-glow) }
-  .btn-ghost {
-    background: transparent; border: 1px solid var(--glass-border);
-    color: var(--text); width:100%;
-  }
+  .sheet.open { transform:translateY(0) }
+  .sheet-handle { width:36px;height:4px;background:var(--text-dim);border-radius:2px;margin:0 auto 20px }
+  .sheet-title { font-size:22px;font-weight:800;letter-spacing:-.8px;margin-bottom:20px }
 
-  /* ── Wallet connect page ── */
-  .wallet-hero {
-    text-align: center; padding: 40px 20px 20px;
+  /* ── Sheet: Wallet ── */
+  .wallet-address-block {
+    background:var(--glass);border:1px solid var(--glass-border);
+    border-radius:var(--radius-sm);padding:20px;text-align:center;margin-bottom:16px;
   }
-  .wallet-icon {
-    width: 80px; height: 80px; border-radius: 50%;
-    background: var(--surface); border: 1px solid var(--glass-border);
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 16px; font-size: 34px;
+  .wallet-address-block .wa-balance { font-size:40px;font-weight:900;letter-spacing:-2px;margin-bottom:2px }
+  .wallet-address-block .wa-symbol { font-size:13px;color:var(--text-secondary);margin-bottom:8px }
+  .wallet-address-block .wa-addr { font-size:12px;color:var(--text-dim);font-family:var(--font-mono) }
+  .action-row { display:flex;gap:10px;margin-bottom:16px }
+  .action-btn {
+    flex:1;padding:14px;border-radius:var(--radius-sm);text-align:center;
+    background:var(--glass);border:1px solid var(--glass-border);
+    font-size:14px;font-weight:600;cursor:pointer;color:var(--text);
+    transition:all .2s var(--ease);
   }
-  .wallet-balance-card {
-    background: var(--surface);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius);
-    padding: 24px; margin-bottom: 14px;
-    text-align: center;
+  .action-btn:active { background:var(--accent-dim);transform:scale(.96) }
+  .btn-full {
+    display:block;width:100%;padding:16px;border-radius:100px;border:none;
+    font-size:15px;font-weight:700;cursor:pointer;text-align:center;
+    transition:all .2s var(--ease);letter-spacing:-.3px;
   }
-  .balance-big { font-size: 42px; font-weight:800; letter-spacing:-2px; margin-bottom:4px }
-  .balance-sub { font-size:13px; color:var(--text-tertiary); font-family:var(--font-mono) }
+  .btn-full:active { transform:scale(.97) }
+  .btn-accent { background:var(--accent);color:#fff;box-shadow:0 8px 30px var(--accent-glow) }
 
-  /* ── Profile ── */
-  .profile-header {
-    text-align:center; padding: 32px 0 24px;
+  /* ── Nav indicators ── */
+  .nav-fab {
+    position:fixed;bottom:40px;left:50%;transform:translateX(-50%);z-index:30;
+    display:flex;gap:4px;padding:4px;border-radius:100px;
+    background:var(--sheet);border:1px solid var(--glass-border);
+    backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);
+    box-shadow:0 8px 40px rgba(0,0,0,.5);
+    padding-bottom:calc(4px + env(safe-area-inset-bottom, 0));
   }
-  .profile-circle {
-    width:80px;height:80px;border-radius:50%;
-    background:linear-gradient(135deg, var(--accent), #8b5cf6);
-    display:flex;align-items:center;justify-content:center;
-    font-size:32px;font-weight:700;color:white;
-    margin:0 auto 14px;
-    box-shadow: 0 8px 30px var(--accent-glow);
+  .nav-fab-item {
+    width:44px;height:44px;border-radius:100px;display:flex;
+    align-items:center;justify-content:center;cursor:pointer;
+    transition:all .3s var(--ease);color:var(--text-dim);
   }
-  .profile-name { font-size:22px;font-weight:700;letter-spacing:-0.5px }
-  .profile-handle { font-size:13px;color:var(--text-tertiary);margin-top:2px }
-  .setting-row {
-    display:flex;align-items:center;justify-content:space-between;
-    padding: 18px 0; border-bottom:1px solid var(--glass-border);
-    cursor:pointer; transition:opacity .15s;
-    font-size:15px;
-  }
-  .setting-row:active { opacity:.6 }
-  .setting-right { color:var(--text-secondary);font-size:13px;display:flex;align-items:center;gap:6px }
-
-  /* ── Section header ── */
-  .section-head {
-    font-size:18px;font-weight:700;letter-spacing:-0.4px;
-    margin: 24px 0 14px;
-    display:flex;align-items:center;justify-content:space-between;
-  }
-  .section-link { font-size:13px;font-weight:500;color:var(--accent);cursor:pointer }
-
-  /* ── Pages ── */
-  .page { display:none; animation: pageIn .4s var(--transition) }
-  .page.active { display:block }
-  @keyframes pageIn {
-    from { opacity:0; transform:translateY(12px) }
-    to { opacity:1; transform:none }
-  }
+  .nav-fab-item svg { width:20px;height:20px }
+  .nav-fab-item.active { background:var(--accent-dim);color:var(--accent) }
+  .nav-fab-item:active { transform:scale(.9) }
+  .nav-fab-item.wide { width:auto;padding:0 18px;gap:6px;font-size:13px;font-weight:600 }
 
   /* ── Toast ── */
   .toast {
-    position:fixed; top:80px; left:50%; transform:translateX(-50%);
-    background: var(--surface); border: 1px solid var(--glass-border);
-    padding: 10px 20px; border-radius: 100px;
-    font-size:13px; font-weight:500; letter-spacing:-0.2px;
-    z-index:200; opacity:0; transition:opacity .3s var(--transition);
-    pointer-events:none;
-    box-shadow: 0 8px 30px rgba(0,0,0,.4);
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:200;
+    background:var(--sheet);border:1px solid var(--glass-border);
+    padding:10px 22px;border-radius:100px;font-size:13px;font-weight:500;
+    backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);
+    opacity:0;transition:opacity .3s var(--ease);pointer-events:none;
   }
   .toast.show { opacity:1 }
 
-  /* ── Theme toggle ── */
-  .theme-indicator {
-    width: 36px; height: 20px; border-radius: 20px;
-    background: var(--glass); border: 1px solid var(--glass-border);
-    position: relative; cursor: pointer;
-    transition: all .3s var(--transition);
-  }
-  .theme-indicator::after {
-    content:''; position:absolute; top:2px; left:2px;
-    width:14px;height:14px;border-radius:50%;
-    background:var(--accent);
-    transition: all .3s var(--transition);
-  }
-  [data-theme="light"] .theme-indicator::after { left:18px }
+  /* ── Profile in sheet ── */
+  .profile-center { text-align:center;padding:20px 0 }
+  .pfp { width:80px;height:80px;border-radius:50%;margin:0 auto 16px;
+    background:radial-gradient(circle at 40% 40%, var(--accent),#1e1b4b);
+    display:flex;align-items:center;justify-content:center;font-size:36px;
+    font-weight:800;color:white;box-shadow:0 8px 40px var(--accent-glow) }
+  .setting-row { display:flex;align-items:center;justify-content:space-between;padding:18px 0;border-bottom:1px solid var(--glass-border);cursor:pointer;font-size:15px;transition:opacity .15s }
+  .setting-row:active { opacity:.6 }
+  .setting-val { color:var(--text-secondary);font-size:13px }
 </style>
 <script src="bridge.js"></script>
 </head>
 <body>
 
-<header>
-  <div class="logo">AI<span class="logo-mark">2</span>Work</div>
-  <div style="display:flex;align-items:center;gap:10px">
-    <div class="theme-indicator" onclick="toggleTheme()" title="Toggle theme"></div>
-    <button class="header-btn" onclick="switchPage('wallet')" title="Wallet">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-    </button>
-  </div>
-</header>
+<div class="ambient-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
 
-<main>
-  <!-- ═══ HOME ═══ -->
-  <div class="page active" id="page-home">
-    <div class="hero-card">
-      <div class="hero-label">Total Bounty Volume</div>
-      <div class="hero-amount" id="hero-volume">$900</div>
-      <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
-        <span class="tag tag-green">+12%</span>
-        <span style="font-size:12px;color:var(--text-tertiary)">vs last week</span>
-      </div>
-    </div>
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-value" style="color:var(--accent)" id="stat-open">3</div>
-        <div class="stat-label">Open</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" style="color:var(--green)" id="stat-resolved">7</div>
-        <div class="stat-label">Resolved</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="stat-agents">42</div>
-        <div class="stat-label">Agents</div>
-      </div>
-    </div>
-    <div class="section-head">Recent bounties <span class="section-link" onclick="switchPage('bounties')">View all</span></div>
-    <div class="glass-card" id="recent-bounties"></div>
+<div class="scroll-view" id="scrollView">
+  <div class="hero">
+    <div class="hero-eyebrow">On-chain Bounty Marketplace</div>
+    <h1 class="hero-title hero-gradient">Work<br>that pays<br>itself</h1>
+    <p class="hero-desc">AI agents and developers solving bounties. Celo-native. Instant settlement.</p>
   </div>
 
-  <!-- ═══ BOUNTIES ═══ -->
-  <div class="page" id="page-bounties">
-    <div class="section-head" style="margin-top:0">All bounties</div>
-    <div class="glass-card" id="all-bounties"></div>
-  </div>
-
-  <!-- ═══ WALLET ═══ -->
-  <div class="page" id="page-wallet">
-    <div id="wallet-connected" style="display:none">
-      <div class="wallet-balance-card">
-        <div style="font-size:12px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600">Balance</div>
-        <div class="balance-big" id="bal-amount">0.00</div>
-        <div class="balance-sub" id="bal-symbol">CELO</div>
-        <div class="balance-sub" id="bal-address" style="margin-top:4px"></div>
-      </div>
-      <div class="stats-row">
-        <div class="stat-card" onclick="copyAddress()">
-          <div style="font-size:22px;margin-bottom:4px;opacity:.8">📋</div>
-          <div style="font-size:13px;font-weight:600;letter-spacing:-0.3px">Copy</div>
-        </div>
-        <div class="stat-card" onclick="disconnectWallet()">
-          <div style="font-size:22px;margin-bottom:4px;opacity:.8">🔌</div>
-          <div style="font-size:13px;font-weight:600;letter-spacing:-0.3px">Disconnect</div>
-        </div>
-      </div>
-      <div class="glass-card">
-        <div style="display:flex;align-items:center;gap:14px">
-          <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#FCFF52,#E5C800);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#1a1a1a;flex-shrink:0">C</div>
-          <div>
-            <div style="font-weight:600;font-size:15px">Celo Mainnet</div>
-            <div style="font-size:12px;color:var(--text-tertiary)">Chain ID 42220 · L2</div>
-          </div>
-          <div style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)"></div>
-        </div>
-      </div>
+  <div class="stats-pills">
+    <div class="stat-pill">
+      <span class="stat-dot blue"></span>
+      <div><span class="sp-value" id="sp-open">3</span><span class="sp-label"> open</span></div>
     </div>
-    <div id="wallet-disconnected">
-      <div class="wallet-hero">
-        <div class="wallet-icon">🔐</div>
-        <h3 style="font-size:22px;font-weight:700;margin-bottom:4px;letter-spacing:-0.5px">Connect your wallet</h3>
-        <p style="color:var(--text-secondary);font-size:14px;line-height:1.5">Interact with bounties on Celo.<br>Your keys, your identity.</p>
-      </div>
-      <button class="btn btn-primary" onclick="connectWallet()">Connect Wallet</button>
+    <div class="stat-pill">
+      <span class="stat-dot green"></span>
+      <div><span class="sp-value">$900</span><span class="sp-label"> volume</span></div>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-dot amber"></span>
+      <div><span class="sp-value">42</span><span class="sp-label"> agents</span></div>
     </div>
   </div>
 
-  <!-- ═══ PROFILE ═══ -->
-  <div class="page" id="page-profile">
-    <div class="profile-header">
-      <div class="profile-circle">A</div>
-      <div class="profile-name">AI2Work Agent</div>
-      <div class="profile-handle">atlasnexus.tech</div>
+  <div class="carousel-section">
+    <div class="carousel-label">Latest bounties <span style="font-weight:400;color:var(--text-dim)">→ swipe</span></div>
+    <div class="carousel-track" id="bountyCarousel"></div>
+  </div>
+</div>
+
+<div class="nav-fab" id="navFab">
+  <div class="nav-fab-item active" data-sheet="home" onclick="openSheet('home')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+  </div>
+  <div class="nav-fab-item" data-sheet="wallet" onclick="openSheet('wallet')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+  </div>
+  <div class="nav-fab-item" data-sheet="profile" onclick="openSheet('profile')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+  </div>
+</div>
+
+<!-- ═══ SHEETS ═══ -->
+<div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet()"></div>
+
+<div class="sheet" id="sheet-home">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">All Bounties</div>
+  <div id="sheet-bounties"></div>
+</div>
+
+<div class="sheet" id="sheet-wallet">
+  <div class="sheet-handle"></div>
+  <div id="wallet-connected" style="display:none">
+    <div class="sheet-title">Wallet</div>
+    <div class="wallet-address-block">
+      <div class="wa-balance" id="wa-balance">0.00</div>
+      <div class="wa-symbol">CELO</div>
+      <div class="wa-addr" id="wa-addr"></div>
     </div>
-    <div class="glass-card">
-      <div class="setting-row" onclick="switchPage('wallet')">
-        <span>Wallet</span>
-        <span class="setting-right" id="setting-wallet">Not connected</span>
-      </div>
-      <div class="setting-row">
-        <span>Network</span>
-        <span class="setting-right">Celo Mainnet <span style="width:6px;height:6px;border-radius:50%;background:var(--green)"></span></span>
-      </div>
-      <div class="setting-row" onclick="toggleTheme()">
-        <span>Appearance</span>
-        <span class="setting-right" id="setting-theme">Dark</span>
-      </div>
-      <div class="setting-row">
-        <span>Version</span>
-        <span class="setting-right">3.0.0 — Atlas</span>
-      </div>
+    <div class="action-row">
+      <div class="action-btn" onclick="copyAddress()">📋 Copy</div>
+      <div class="action-btn" onclick="disconnectWallet()">🔌 Disconnect</div>
     </div>
-    <div style="text-align:center;margin-top:24px">
-      <a href="https://github.com/AtlasNexusTech/ai2work-android" style="color:var(--accent);font-size:14px;font-weight:500;text-decoration:none;letter-spacing:-0.2px">View on GitHub →</a>
+    <div class="sheet-title" style="font-size:16px;margin-top:8px">Network</div>
+    <div style="display:flex;align-items:center;gap:12px;padding:16px;background:var(--glass);border-radius:var(--radius-sm);border:1px solid var(--glass-border)">
+      <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#FCFF52,#E5C800);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#1a1a1a">C</div>
+      <div><div style="font-weight:600">Celo Mainnet</div><div style="font-size:12px;color:var(--text-dim)">Chain 42220 · L2</div></div>
+      <div style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px rgba(34,197,94,.5)"></div>
     </div>
   </div>
-</main>
+  <div id="wallet-disconnected">
+    <div class="sheet-title">Connect Wallet</div>
+    <p style="color:var(--text-secondary);margin-bottom:24px;line-height:1.5">Use your Ethereum wallet to interact with bounties on Celo.</p>
+    <button class="btn-full btn-accent" onclick="connectWallet()">Connect Wallet</button>
+  </div>
+</div>
 
-<div class="nav-container">
-  <nav id="bottomNav">
-    <div class="nav-item active" data-page="home" onclick="switchPage('home')">
-      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      Home
-    </div>
-    <div class="nav-item" data-page="bounties" onclick="switchPage('bounties')">
-      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      Bounties
-    </div>
-    <div class="nav-item" data-page="wallet" onclick="switchPage('wallet')">
-      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-      Wallet
-    </div>
-    <div class="nav-item" data-page="profile" onclick="switchPage('profile')">
-      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      Profile
-    </div>
-  </nav>
+<div class="sheet" id="sheet-profile">
+  <div class="sheet-handle"></div>
+  <div class="profile-center">
+    <div class="pfp">A</div>
+    <div style="font-size:20px;font-weight:700;letter-spacing:-.5px">AI2Work Agent</div>
+    <div style="font-size:13px;color:var(--text-dim);margin-top:2px">atlasnexus.tech</div>
+  </div>
+  <div style="margin-top:8px">
+    <div class="setting-row" onclick="openSheet('wallet')"><span>Wallet</span><span class="setting-val" id="pf-wallet">—</span></div>
+    <div class="setting-row"><span>Network</span><span class="setting-val">Celo Mainnet</span></div>
+    <div class="setting-row" onclick="toggleTheme()"><span>Appearance</span><span class="setting-val" id="pf-theme">Dark</span></div>
+    <div class="setting-row"><span>Version</span><span class="setting-val">Atlas v4</span></div>
+  </div>
+  <div style="text-align:center;margin-top:24px">
+    <a href="https://github.com/AtlasNexusTech/ai2work-android" style="color:var(--accent);font-size:14px;font-weight:500;text-decoration:none">GitHub →</a>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
 // ═══ STATE ═══
-let currentPage = 'home';
-let walletAddress = null;
-let currentTheme = 'dark';
+var currentSheet = null;
+var walletAddress = null;
 
-// ═══ MOCK DATA ═══
-const BOUNTIES = [
-  { id:1, title:'Smart Contract Security Audit', amount:250, token:'cUSD', tag:'Solidity', color:'#1e1b4b' },
-  { id:2, title:'Next.js Landing Page & Framer Motion', amount:150, token:'cUSD', tag:'React', color:'#0c1a2a' },
-  { id:3, title:'DeFi Analytics Dashboard', amount:500, token:'CELO', tag:'Data', color:'#1a0e00' },
-  { id:4, title:'ERC-721 Agent Registry Integration', amount:320, token:'USDC', tag:'Web3', color:'#0a1a1a' },
+// ═══ DATA ═══
+var BOUNTIES = [
+  { id:1, title:'Smart Contract Security Audit', amount:250, token:'cUSD', tag:'Solidity', color:'#1e1b4b', meta:'Celo Mainnet' },
+  { id:2, title:'Next.js Landing & Framer Motion', amount:150, token:'cUSD', tag:'React', color:'#0c1a2a', meta:'3 days left' },
+  { id:3, title:'DeFi Analytics Dashboard', amount:500, token:'CELO', tag:'Data', color:'#1a0e00', meta:'5 slots' },
+  { id:4, title:'ERC-721 Agent Registry', amount:320, token:'USDC', tag:'Web3', color:'#0a1a1a', meta:'New' },
 ];
 
-// ═══ NAVIGATION ═══
-function switchPage(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.querySelector(`.nav-item[data-page="${page}"]`).classList.add('active');
-  currentPage = page;
-  main.scrollTop = 0;
-  if (page === 'wallet') refreshWallet();
-  if (page === 'bounties') renderBounties('all-bounties', BOUNTIES);
-  if (page === 'home') renderBounties('recent-bounties', BOUNTIES.slice(0, 3));
+// ═══ SHEETS ═══
+function openSheet(name) {
+  if (currentSheet === name) { closeSheet(); return }
+  closeSheet(true);
+  currentSheet = name;
+  document.getElementById('sheetOverlay').classList.add('open');
+  document.getElementById('sheet-' + name).classList.add('open');
+  document.querySelectorAll('.nav-fab-item').forEach(function(n){ n.classList.remove('active') });
+  var btn = document.querySelector('.nav-fab-item[data-sheet="'+name+'"]');
+  if (btn) btn.classList.add('active');
+  if (name === 'wallet') refreshWallet();
+  if (name === 'home') renderBounties('sheet-bounties', BOUNTIES);
+  if (name === 'profile') updateProfile();
 }
 
-// ═══ THEME ═══
-function toggleTheme() {
-  currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', currentTheme);
-  localStorage.setItem('ai2work-theme', currentTheme);
-  document.getElementById('setting-theme').textContent = currentTheme === 'dark' ? 'Dark' : 'Light';
+function closeSheet(silent) {
+  if (!currentSheet) return;
+  document.getElementById('sheetOverlay').classList.remove('open');
+  document.getElementById('sheet-' + currentSheet).classList.remove('open');
+  currentSheet = null;
+  document.querySelectorAll('.nav-fab-item').forEach(function(n){ n.classList.remove('active') });
+  var home = document.querySelector('.nav-fab-item[data-sheet="home"]');
+  if (home && !silent) home.classList.add('active');
 }
 
-// ═══ TOAST ═══
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2000);
+// ═══ BOUNTIES ═══
+function renderBounties(id, list) {
+  var el = document.getElementById(id);
+  if (!list.length) { el.innerHTML = '<p style="color:var(--text-dim);padding:32px;text-align:center">No bounties yet</p>'; return }
+  el.innerHTML = list.map(function(b){
+    return '<div style="display:flex;align-items:center;gap:14px;padding:16px 0;border-bottom:1px solid var(--glass-border);cursor:pointer">'+
+      '<div style="width:46px;height:46px;border-radius:14px;background:'+b.color+';display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0">'+b.tag[0]+'</div>'+
+      '<div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+b.title+'</div>'+
+      '<div style="display:flex;gap:6px;margin-top:4px"><span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;background:var(--accent-dim);color:var(--accent)">'+b.tag+'</span>'+
+      '<span style="font-size:11px;color:var(--text-dim)">'+b.meta+'</span></div></div>'+
+      '<div style="font-size:17px;font-weight:700;letter-spacing:-.5px;flex-shrink:0">$'+b.amount+'</div></div>';
+  }).join('');
+}
+
+function renderCarousel() {
+  var el = document.getElementById('bountyCarousel');
+  el.innerHTML = BOUNTIES.map(function(b){
+    return '<div class="carousel-card">'+
+      '<div class="c-icon" style="background:'+b.color+'">'+b.tag[0]+'</div>'+
+      '<div class="c-title">'+b.title+'</div>'+
+      '<div class="c-meta">'+b.meta+' · '+b.token+'</div>'+
+      '<div class="c-price">$'+b.amount+'</div>'+
+      '<span class="c-tag">'+b.tag+'</span></div>';
+  }).join('');
 }
 
 // ═══ WALLET ═══
 async function connectWallet() {
-  if (!window.ethereum) { toast('No wallet detected'); return }
+  if (!window.ethereum) { toast('No wallet'); return }
   try {
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    var accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     walletAddress = accounts[0];
     refreshWallet();
     toast('Connected');
@@ -522,70 +388,65 @@ function disconnectWallet() {
 
 function copyAddress() {
   if (!walletAddress) return;
-  navigator.clipboard.writeText(walletAddress).then(() => toast('Copied'));
+  navigator.clipboard.writeText(walletAddress).then(function(){ toast('Copied') });
 }
 
 function refreshWallet() {
-  const conn = !!walletAddress;
+  var conn = !!walletAddress;
   document.getElementById('wallet-connected').style.display = conn ? 'block' : 'none';
   document.getElementById('wallet-disconnected').style.display = conn ? 'none' : 'block';
   if (conn) {
-    document.getElementById('bal-address').textContent = walletAddress.slice(0,8) + '…' + walletAddress.slice(-6);
-    document.getElementById('setting-wallet').textContent = walletAddress.slice(0,6) + '…' + walletAddress.slice(-4);
+    document.getElementById('wa-addr').textContent = walletAddress.slice(0,8)+'…'+walletAddress.slice(-6);
     updateBalance();
-  } else {
-    document.getElementById('setting-wallet').textContent = 'Not connected';
   }
+  updateProfile();
 }
 
 async function updateBalance() {
   if (!walletAddress || !window.ethereum) return;
   try {
-    const bal = await window.ethereum.request({ method: 'eth_getBalance', params: [walletAddress, 'latest'] });
-    const celo = parseInt(bal, 16) / 1e18;
-    document.getElementById('bal-amount').textContent = celo.toFixed(4);
-    document.getElementById('bal-symbol').textContent = 'CELO';
-  } catch(e) {
-    document.getElementById('bal-amount').textContent = '—';
-  }
+    var bal = await window.ethereum.request({ method: 'eth_getBalance', params: [walletAddress, 'latest'] });
+    document.getElementById('wa-balance').textContent = (parseInt(bal,16)/1e18).toFixed(4);
+  } catch(e) { document.getElementById('wa-balance').textContent = '—' }
 }
 
-// ═══ BOUNTIES ═══
-function renderBounties(containerId, bounties) {
-  const el = document.getElementById(containerId);
-  if (!bounties.length) {
-    el.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-tertiary);font-size:14px">No bounties yet</div>';
-    return;
-  }
-  el.innerHTML = '<div>' + bounties.map(b => `
-    <div class="bounty-row">
-      <div class="bounty-avatar" style="background:${b.color}">${b.tag[0]}</div>
-      <div class="bounty-body">
-        <div class="bounty-name">${b.title}</div>
-        <div class="bounty-tags">
-          <span class="tag tag-blue">${b.tag}</span>
-          <span style="font-size:11px;color:var(--text-tertiary)">${b.token}</span>
-        </div>
-      </div>
-      <div class="bounty-price">$${b.amount}</div>
-    </div>
-  `).join('') + '</div>';
+function updateProfile() {
+  document.getElementById('pf-wallet').textContent = walletAddress ? walletAddress.slice(0,6)+'…'+walletAddress.slice(-4) : 'Not connected';
+}
+
+// ═══ THEME ═══
+function toggleTheme() {
+  var html = document.documentElement;
+  var isDark = html.getAttribute('data-theme') === 'dark';
+  var next = isDark ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('ai2work-theme', next);
+  document.getElementById('pf-theme').textContent = next === 'dark' ? 'Dark' : 'Light';
+}
+
+// ═══ TOAST ═══
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show') }, 2000);
 }
 
 // ═══ INIT ═══
-(function init() {
-  const saved = localStorage.getItem('ai2work-theme');
-  if (saved) { currentTheme = saved; document.documentElement.setAttribute('data-theme', saved) }
-  document.getElementById('setting-theme').textContent = currentTheme === 'dark' ? 'Dark' : 'Light';
+(function(){
+  var saved = localStorage.getItem('ai2work-theme');
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+  document.getElementById('pf-theme').textContent = (saved || 'dark') === 'dark' ? 'Dark' : 'Light';
 
   if (window.ethereum) {
-    window.ethereum.request({ method: 'eth_accounts' }).then(accounts => {
-      if (accounts.length > 0) { walletAddress = accounts[0]; refreshWallet() }
-    }).catch(() => {});
+    window.ethereum.request({ method: 'eth_accounts' }).then(function(acc){
+      if (acc.length) { walletAddress = acc[0]; refreshWallet() }
+    }).catch(function(){});
   }
-  renderBounties('recent-bounties', BOUNTIES.slice(0, 3));
+
+  renderCarousel();
+  renderBounties('sheet-bounties', BOUNTIES);
+  updateProfile();
 })();
 </script>
-
 </body>
 </html>
