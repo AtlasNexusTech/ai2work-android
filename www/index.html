@@ -1,31 +1,58 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover,user-scalable=no">
 <title>AI2Work</title>
 <style>
+  /* ══════════════════════════════════════════
+     ATLAS DESIGN SYSTEM v3 — 2030-ready
+     Glass · Typography · Spatial · Fluid
+     ══════════════════════════════════════════ */
+
   :root {
-    --bg: #f5f5f5;
-    --card: #ffffff;
-    --text: #1a1a1a;
-    --text-secondary: #6b6b6b;
-    --text-tertiary: #9e9e9e;
-    --primary: #0066FF;
-    --primary-light: #E8F0FE;
-    --green: #00C853;
-    --red: #FF3D00;
-    --orange: #FF9100;
-    --border: #e8e8e8;
-    --radius: 16px;
-    --radius-sm: 12px;
-    --shadow: 0 1px 3px rgba(0,0,0,.06);
-    --shadow-md: 0 4px 12px rgba(0,0,0,.08);
-    --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --nav-height: 72px;
-    --header-height: 56px;
+    --bg: #000000;
+    --surface: #0d0d0d;
+    --surface-raised: #141414;
+    --glass: rgba(255,255,255,.04);
+    --glass-border: rgba(255,255,255,.06);
+    --glass-hover: rgba(255,255,255,.06);
+    --text: #f5f5f5;
+    --text-secondary: #a0a0a0;
+    --text-tertiary: #606060;
+    --accent: #3b82f6;
+    --accent-soft: rgba(59,130,246,.12);
+    --accent-glow: rgba(59,130,246,.3);
+    --green: #22c55e;
+    --green-soft: rgba(34,197,94,.12);
+    --red: #ef4444;
+    --orange: #f59e0b;
+    --radius: 20px;
+    --radius-sm: 14px;
+    --radius-btn: 100px;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    --font-mono: 'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
+    --nav-height: 88px;
+    --header-height: 60px;
+    --transition: cubic-bezier(.22,1,.36,1);
   }
+
+  [data-theme="light"] {
+    --bg: #f8f8f8;
+    --surface: #ffffff;
+    --surface-raised: #f5f5f5;
+    --glass: rgba(0,0,0,.02);
+    --glass-border: rgba(0,0,0,.06);
+    --glass-hover: rgba(0,0,0,.03);
+    --text: #0a0a0a;
+    --text-secondary: #6e6e6e;
+    --text-tertiary: #b0b0b0;
+    --accent-soft: rgba(59,130,246,.08);
+    --green-soft: rgba(34,197,94,.08);
+  }
+
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent }
+  html { height:100dvh; overflow:hidden }
   body {
     font-family: var(--font);
     background: var(--bg);
@@ -33,336 +60,458 @@
     height: 100dvh; overflow: hidden;
     display: flex; flex-direction: column;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     user-select: none;
+    transition: background .5s var(--transition);
   }
+
   /* ── Header ── */
   header {
     height: var(--header-height);
     padding: 0 20px;
     display: flex; align-items: center; justify-content: space-between;
-    background: var(--card);
-    border-bottom: 1px solid var(--border);
     flex-shrink: 0;
+    position: relative; z-index: 20;
   }
-  .logo { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; color: #1a1a1a }
-  .logo span { color: var(--primary) }
-  .header-actions { display:flex; gap:12px; align-items:center }
-  .icon-btn {
-    width: 36px; height: 36px; border-radius: 50%;
-    border: none; background: var(--bg);
+  .logo {
+    font-size: 22px; font-weight: 700; letter-spacing: -0.6px;
+    display: flex; align-items: baseline; gap: 1px;
+  }
+  .logo-mark { color: var(--accent) }
+  .header-btn {
+    width: 38px; height: 38px; border-radius: 50%;
+    border: 1px solid var(--glass-border); background: var(--glass);
     display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: background .15s;
+    cursor: pointer; transition: all .2s var(--transition);
+    color: var(--text-secondary);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
   }
-  .icon-btn:active { background: #e0e0e0 }
-  .badge { position:relative }
-  .badge::after {
-    content:''; position:absolute; top:4px; right:4px;
-    width:8px;height:8px;border-radius:50%;background:var(--red);
-    border: 2px solid var(--card);
+  .header-btn:active { background: var(--glass-hover); transform: scale(.94) }
+
+  /* ── Main ── */
+  main {
+    flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    padding: 8px 16px 20px;
+    scroll-behavior: smooth;
+    position: relative; z-index: 10;
   }
-  /* ── Main content ── */
-  main { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding: 16px 20px 20px; scroll-behavior: smooth }
-  /* ── Bottom Nav ── */
-  nav#bottomNav {
-    height: var(--nav-height);
-    background: var(--card);
-    border-top: 1px solid var(--border);
-    display: flex; align-items: center;
-    padding: 0 8px;
+  main::-webkit-scrollbar { display:none }
+
+  /* ── Bottom Nav (floating pill) ── */
+  .nav-container {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    z-index: 100; width: calc(100% - 32px); max-width: 400px;
     padding-bottom: env(safe-area-inset-bottom, 0);
-    flex-shrink: 0;
+  }
+  nav#bottomNav {
+    display: flex; align-items: center; justify-content: space-around;
+    background: var(--surface); border: 1px solid var(--glass-border);
+    border-radius: 100px; padding: 6px;
+    box-shadow: 0 8px 40px rgba(0,0,0,.4), 0 2px 8px rgba(0,0,0,.2);
+    backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
   }
   .nav-item {
-    flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;
-    cursor:pointer; color: var(--text-tertiary); transition: color .15s;
-    padding: 8px 0; border-radius: 12px;
-    font-size: 11px; font-weight: 500;
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:2px;
+    cursor:pointer; padding: 10px 6px 8px; border-radius: 100px;
+    transition: all .3s var(--transition); position: relative;
+    color: var(--text-tertiary); font-size: 10px; font-weight: 500;
+    letter-spacing: 0.2px;
   }
-  .nav-item.active { color: var(--primary); font-weight: 600 }
-  .nav-item svg { width: 22px; height: 22px }
-  /* ── Cards ── */
-  .card {
-    background: var(--card); border-radius: var(--radius);
-    padding: 16px; margin-bottom: 12px;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-    transition: box-shadow .2s;
-    cursor: pointer;
+  .nav-item svg { width: 22px; height: 22px; transition: transform .3s var(--transition) }
+  .nav-item.active {
+    color: var(--accent);
+    background: var(--accent-soft);
   }
-  .card:active { box-shadow: var(--shadow-md) }
-  .card-row { display:flex; gap:12px }
-  .card-row .card { flex:1; min-width:0 }
-  .card-title { font-size:13px; color:var(--text-secondary); margin-bottom:6px; font-weight:500 }
-  .card-value { font-size:28px; font-weight:700; letter-spacing:-0.5px }
-  .card-subtitle { font-size:12px; color:var(--text-tertiary); margin-top:4px }
-  /* ── Bounty item ── */
-  .bounty {
-    display:flex; align-items:center; gap:14px;
-    padding: 14px 0; border-bottom: 1px solid var(--border);
-    cursor:pointer; transition: opacity .15s;
+  .nav-item.active svg { transform: translateY(-1px) }
+  .nav-item:active { transform: scale(.94) }
+
+  /* ── Glass Card ── */
+  .glass-card {
+    background: var(--surface);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    padding: 20px; margin-bottom: 14px;
+    position: relative; overflow: hidden;
+    transition: all .3s var(--transition);
   }
-  .bounty:last-child { border-bottom:none }
-  .bounty:active { opacity:.6 }
-  .bounty-icon {
-    width:44px;height:44px;border-radius:var(--radius-sm);
+  .glass-card::before {
+    content:''; position:absolute; inset:0;
+    background: radial-gradient(ellipse at 50% 0%, var(--accent-soft), transparent 70%);
+    opacity: 0; transition: opacity .4s var(--transition);
+    pointer-events: none;
+  }
+  .glass-card:active::before { opacity: 1 }
+  .glass-card:active { transform: scale(.985); border-color: rgba(255,255,255,.08) }
+
+  /* ── Hero card ── */
+  .hero-card {
+    background: var(--surface);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    padding: 28px 24px; margin-bottom: 20px;
+    position: relative; overflow: hidden;
+  }
+  .hero-card::after {
+    content:''; position:absolute; top:-40%; right:-20%;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, var(--accent-glow), transparent 70%);
+    pointer-events: none; opacity: .5;
+  }
+  .hero-amount {
+    font-size: 48px; font-weight: 800; letter-spacing: -2px;
+    line-height: 1; margin-bottom: 6px;
+    background: linear-gradient(135deg, #fff 0%, #888 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  [data-theme="light"] .hero-amount {
+    background: linear-gradient(135deg, #0a0a0a 0%, #555 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-label { font-size: 13px; color: var(--text-secondary); font-weight: 500; letter-spacing: .5px; text-transform: uppercase }
+
+  /* ── Stats row ── */
+  .stats-row { display:flex; gap:10px; margin-bottom:20px }
+  .stat-card {
+    flex:1; background: var(--surface);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    padding: 16px; text-align: center;
+    transition: all .3s var(--transition);
+  }
+  .stat-card:active { background: var(--surface-raised); transform: scale(.97) }
+  .stat-value { font-size: 26px; font-weight: 700; letter-spacing: -1px }
+  .stat-label { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; font-weight: 500; letter-spacing: .3px }
+
+  /* ── Bounty row ── */
+  .bounty-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 16px 0; border-bottom: 1px solid var(--glass-border);
+    cursor: pointer; transition: opacity .2s;
+  }
+  .bounty-row:last-child { border-bottom:none }
+  .bounty-row:active { opacity:.6 }
+  .bounty-avatar {
+    width:46px;height:46px;border-radius:var(--radius-sm);
     display:flex;align-items:center;justify-content:center;
-    font-size:20px; flex-shrink:0;
+    font-size:18px;font-weight:600;flex-shrink:0;
+    letter-spacing: -0.5px;
   }
-  .bounty-info { flex:1; min-width:0 }
-  .bounty-title { font-size:15px; font-weight:600; margin-bottom:3px; white-space:nowrap;overflow:hidden;text-overflow:ellipsis }
-  .bounty-meta { font-size:12px; color:var(--text-tertiary); display:flex;gap:8px }
-  .bounty-amount { font-weight:700; font-size:16px; text-align:right; white-space:nowrap; flex-shrink:0 }
+  .bounty-body { flex:1; min-width:0 }
+  .bounty-name { font-size:15px; font-weight:600; margin-bottom:2px; white-space:nowrap;overflow:hidden;text-overflow:ellipsis }
+  .bounty-tags { display:flex;gap:6px }
+  .bounty-price { font-weight:700; font-size:17px; text-align:right; white-space:nowrap; flex-shrink:0; letter-spacing:-0.5px }
+
+  /* ── Tags ── */
   .tag {
-    display:inline-block; padding:3px 10px; border-radius:20px;
-    font-size:11px; font-weight:600;
+    display:inline-block; padding:3px 8px; border-radius:6px;
+    font-size:10px; font-weight:600; letter-spacing:.3px;
   }
-  .tag-green { background:#E8F5E9; color:#2E7D32 }
-  .tag-blue { background:var(--primary-light); color:var(--primary) }
-  .tag-orange { background:#FFF3E0; color:#E65100 }
-  /* ── Balance card ── */
-  .balance-card {
-    background: linear-gradient(135deg, #0066FF, #0044CC);
-    color: white; border-radius: var(--radius);
-    padding: 20px; margin-bottom: 16px;
-    box-shadow: 0 8px 24px rgba(0,102,255,.25);
-  }
-  .balance-label { font-size:12px; opacity:.8; margin-bottom:4px; font-weight:500 }
-  .balance-amount { font-size:36px; font-weight:700; letter-spacing:-1px }
-  .balance-address { font-size:12px; opacity:.6; margin-top:6px; font-family:monospace }
-  /* ── Button ── */
+  .tag-blue { background:var(--accent-soft); color:var(--accent) }
+  .tag-green { background:var(--green-soft); color:var(--green) }
+
+  /* ── Buttons ── */
   .btn {
     display:inline-flex; align-items:center; justify-content:center; gap:8px;
-    padding: 12px 24px; border-radius: 28px; border: none;
-    font-size: 14px; font-weight: 600; cursor: pointer;
-    transition: transform .15s, opacity .15s;
+    padding: 14px 28px; border-radius: var(--radius-btn); border: none;
+    font-size: 15px; font-weight: 600; cursor: pointer;
+    transition: all .2s var(--transition);
+    letter-spacing: -0.2px;
+    position: relative; overflow: hidden;
   }
-  .btn:active { transform:scale(.97); opacity:.8 }
-  .btn-primary { background: var(--primary); color: white; width:100% }
-  .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); width:100% }
-  .btn-group { display:flex; gap:10px; margin-bottom:20px }
-  /* ── Sections ── */
-  .section-title { font-size:18px; font-weight:700; margin: 20px 0 12px; letter-spacing:-0.3px }
-  /* ── Connect prompt ── */
-  .connect-prompt {
-    text-align:center; padding:40px 20px;
-    background: var(--card); border-radius: var(--radius);
-    border: 1px solid var(--border);
+  .btn:active { transform: scale(.96) }
+  .btn-primary {
+    background: var(--accent); color: white; width:100%;
+    box-shadow: 0 8px 30px var(--accent-glow);
   }
-  .connect-prompt h3 { font-size:18px; margin:12px 0 6px }
-  .connect-prompt p { color:var(--text-secondary); font-size:14px }
+  .btn-primary:active { box-shadow: 0 4px 16px var(--accent-glow) }
+  .btn-ghost {
+    background: transparent; border: 1px solid var(--glass-border);
+    color: var(--text); width:100%;
+  }
+
+  /* ── Wallet connect page ── */
+  .wallet-hero {
+    text-align: center; padding: 40px 20px 20px;
+  }
+  .wallet-icon {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: var(--surface); border: 1px solid var(--glass-border);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px; font-size: 34px;
+  }
+  .wallet-balance-card {
+    background: var(--surface);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    padding: 24px; margin-bottom: 14px;
+    text-align: center;
+  }
+  .balance-big { font-size: 42px; font-weight:800; letter-spacing:-2px; margin-bottom:4px }
+  .balance-sub { font-size:13px; color:var(--text-tertiary); font-family:var(--font-mono) }
+
   /* ── Profile ── */
-  .profile-avatar {
-    width:72px;height:72px;border-radius:50%;
-    background: linear-gradient(135deg, #0066FF, #0044CC);
+  .profile-header {
+    text-align:center; padding: 32px 0 24px;
+  }
+  .profile-circle {
+    width:80px;height:80px;border-radius:50%;
+    background:linear-gradient(135deg, var(--accent), #8b5cf6);
     display:flex;align-items:center;justify-content:center;
-    font-size:30px; color:white; margin-bottom:12px
+    font-size:32px;font-weight:700;color:white;
+    margin:0 auto 14px;
+    box-shadow: 0 8px 30px var(--accent-glow);
   }
-  .profile-name { font-size:22px; font-weight:700 }
-  .profile-id { font-size:13px; color:var(--text-tertiary); margin-top:2px }
-  .setting-item {
-    display:flex; align-items:center; justify-content:space-between;
-    padding: 16px 0; border-bottom:1px solid var(--border);
-    cursor:pointer;
+  .profile-name { font-size:22px;font-weight:700;letter-spacing:-0.5px }
+  .profile-handle { font-size:13px;color:var(--text-tertiary);margin-top:2px }
+  .setting-row {
+    display:flex;align-items:center;justify-content:space-between;
+    padding: 18px 0; border-bottom:1px solid var(--glass-border);
+    cursor:pointer; transition:opacity .15s;
+    font-size:15px;
   }
-  .setting-item:active { opacity:.6 }
-  .setting-label { font-size:15px; font-weight:500 }
-  .setting-value { font-size:13px; color:var(--text-tertiary) }
-  /* ── Page visibility ── */
-  .page { display:none }
+  .setting-row:active { opacity:.6 }
+  .setting-right { color:var(--text-secondary);font-size:13px;display:flex;align-items:center;gap:6px }
+
+  /* ── Section header ── */
+  .section-head {
+    font-size:18px;font-weight:700;letter-spacing:-0.4px;
+    margin: 24px 0 14px;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .section-link { font-size:13px;font-weight:500;color:var(--accent);cursor:pointer }
+
+  /* ── Pages ── */
+  .page { display:none; animation: pageIn .4s var(--transition) }
   .page.active { display:block }
-  /* ── Skeleton loading ── */
-  .skeleton { background: linear-gradient(90deg, #eee 0%, #f5f5f5 50%, #eee 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius:8px }
-  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-  .sk-row { height:60px; margin-bottom:10px }
-  .sk-card { height:100px; border-radius:var(--radius) }
-  /* ── Animations ── */
-  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
-  .fade-in { animation: fadeIn .3s ease }
+  @keyframes pageIn {
+    from { opacity:0; transform:translateY(12px) }
+    to { opacity:1; transform:none }
+  }
+
   /* ── Toast ── */
   .toast {
-    position:fixed; bottom:calc(var(--nav-height) + 20px + env(safe-area-inset-bottom, 0));
-    left:50%; transform:translateX(-50%);
-    background:#1a1a1a; color:white;
-    padding:10px 20px; border-radius:24px;
-    font-size:13px; font-weight:500;
-    z-index:100; opacity:0; transition:opacity .3s;
+    position:fixed; top:80px; left:50%; transform:translateX(-50%);
+    background: var(--surface); border: 1px solid var(--glass-border);
+    padding: 10px 20px; border-radius: 100px;
+    font-size:13px; font-weight:500; letter-spacing:-0.2px;
+    z-index:200; opacity:0; transition:opacity .3s var(--transition);
     pointer-events:none;
+    box-shadow: 0 8px 30px rgba(0,0,0,.4);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
   }
   .toast.show { opacity:1 }
+
+  /* ── Theme toggle ── */
+  .theme-indicator {
+    width: 36px; height: 20px; border-radius: 20px;
+    background: var(--glass); border: 1px solid var(--glass-border);
+    position: relative; cursor: pointer;
+    transition: all .3s var(--transition);
+  }
+  .theme-indicator::after {
+    content:''; position:absolute; top:2px; left:2px;
+    width:14px;height:14px;border-radius:50%;
+    background:var(--accent);
+    transition: all .3s var(--transition);
+  }
+  [data-theme="light"] .theme-indicator::after { left:18px }
 </style>
-<!-- Native wallet bridge --><script src="bridge.js"></script>
+<script src="bridge.js"></script>
 </head>
 <body>
 
 <header>
-  <div class="logo">AI<span>2</span>Work</div>
-  <div class="header-actions">
-    <button class="icon-btn badge" onclick="switchPage('wallet')" title="Wallet">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+  <div class="logo">AI<span class="logo-mark">2</span>Work</div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="theme-indicator" onclick="toggleTheme()" title="Toggle theme"></div>
+    <button class="header-btn" onclick="switchPage('wallet')" title="Wallet">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
     </button>
   </div>
 </header>
 
 <main>
-  <!-- HOME -->
+  <!-- ═══ HOME ═══ -->
   <div class="page active" id="page-home">
-    <div class="card-row" style="margin-bottom:12px">
-      <div class="card" style="text-align:center">
-        <div class="card-title">Open Bounties</div>
-        <div class="card-value" id="stat-bounties" style="color:var(--primary)">—</div>
-        <div class="card-subtitle">+0 this week</div>
-      </div>
-      <div class="card" style="text-align:center">
-        <div class="card-title">Total Volume</div>
-        <div class="card-value" id="stat-volume" style="color:var(--green)">—</div>
-        <div class="card-subtitle">on-chain</div>
+    <div class="hero-card">
+      <div class="hero-label">Total Bounty Volume</div>
+      <div class="hero-amount" id="hero-volume">$900</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+        <span class="tag tag-green">+12%</span>
+        <span style="font-size:12px;color:var(--text-tertiary)">vs last week</span>
       </div>
     </div>
-    <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <div>
-          <div class="card-title">Your Agent</div>
-          <div style="font-size:15px;font-weight:600" id="agent-status">Not registered</div>
-        </div>
-        <span class="tag tag-blue" id="agent-badge" style="display:none">Agent #0</span>
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value" style="color:var(--accent)" id="stat-open">3</div>
+        <div class="stat-label">Open</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color:var(--green)" id="stat-resolved">7</div>
+        <div class="stat-label">Resolved</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-agents">42</div>
+        <div class="stat-label">Agents</div>
       </div>
     </div>
-    <div class="section-title">Recent Bounties</div>
-    <div id="recent-bounties"><div class="skeleton sk-row"></div><div class="skeleton sk-row"></div><div class="skeleton sk-row"></div></div>
+    <div class="section-head">Recent bounties <span class="section-link" onclick="switchPage('bounties')">View all</span></div>
+    <div class="glass-card" id="recent-bounties"></div>
   </div>
 
-  <!-- BOUNTIES -->
+  <!-- ═══ BOUNTIES ═══ -->
   <div class="page" id="page-bounties">
-    <div class="section-title" style="margin-top:0">All Bounties</div>
-    <div id="all-bounties"><div class="skeleton sk-row"></div><div class="skeleton sk-row"></div><div class="skeleton sk-row"></div></div>
+    <div class="section-head" style="margin-top:0">All bounties</div>
+    <div class="glass-card" id="all-bounties"></div>
   </div>
 
-  <!-- WALLET -->
+  <!-- ═══ WALLET ═══ -->
   <div class="page" id="page-wallet">
     <div id="wallet-connected" style="display:none">
-      <div class="balance-card">
-        <div class="balance-label">Balance</div>
-        <div class="balance-amount" id="bal-amount">0.00</div>
-        <div class="balance-address" id="bal-address"></div>
-        <div style="margin-top:12px;font-size:12px;opacity:.7" id="bal-symbol">CELO</div>
+      <div class="wallet-balance-card">
+        <div style="font-size:12px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600">Balance</div>
+        <div class="balance-big" id="bal-amount">0.00</div>
+        <div class="balance-sub" id="bal-symbol">CELO</div>
+        <div class="balance-sub" id="bal-address" style="margin-top:4px"></div>
       </div>
-      <div class="card-row">
-        <div class="card" style="text-align:center" onclick="copyAddress()">
-          <div style="font-size:24px;margin-bottom:4px">📋</div>
-          <div style="font-size:13px;font-weight:600">Copy Address</div>
+      <div class="stats-row">
+        <div class="stat-card" onclick="copyAddress()">
+          <div style="font-size:22px;margin-bottom:4px;opacity:.8">📋</div>
+          <div style="font-size:13px;font-weight:600;letter-spacing:-0.3px">Copy</div>
         </div>
-        <div class="card" style="text-align:center" id="disconnect-btn" onclick="disconnectWallet()">
-          <div style="font-size:24px;margin-bottom:4px">🔌</div>
-          <div style="font-size:13px;font-weight:600">Disconnect</div>
+        <div class="stat-card" onclick="disconnectWallet()">
+          <div style="font-size:22px;margin-bottom:4px;opacity:.8">🔌</div>
+          <div style="font-size:13px;font-weight:600;letter-spacing:-0.3px">Disconnect</div>
         </div>
       </div>
-      <div class="section-title">Chain</div>
-      <div class="card">
-        <div style="display:flex;align-items:center;gap:12px">
-          <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#FCFF52,#E5C800);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#1a1a1a">C</div>
+      <div class="glass-card">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#FCFF52,#E5C800);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#1a1a1a;flex-shrink:0">C</div>
           <div>
-            <div style="font-weight:600">Celo Mainnet</div>
-            <div style="font-size:12px;color:var(--text-tertiary)">Chain ID 42220</div>
+            <div style="font-weight:600;font-size:15px">Celo Mainnet</div>
+            <div style="font-size:12px;color:var(--text-tertiary)">Chain ID 42220 · L2</div>
           </div>
+          <div style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)"></div>
         </div>
       </div>
     </div>
     <div id="wallet-disconnected">
-      <div class="connect-prompt" style="margin-bottom:16px">
-        <div style="font-size:48px;margin-bottom:8px">🔐</div>
-        <h3>Connect Wallet</h3>
-        <p>Use your Ethereum wallet to interact with AI2Work bounties on Celo.</p>
+      <div class="wallet-hero">
+        <div class="wallet-icon">🔐</div>
+        <h3 style="font-size:22px;font-weight:700;margin-bottom:4px;letter-spacing:-0.5px">Connect your wallet</h3>
+        <p style="color:var(--text-secondary);font-size:14px;line-height:1.5">Interact with bounties on Celo.<br>Your keys, your identity.</p>
       </div>
       <button class="btn btn-primary" onclick="connectWallet()">Connect Wallet</button>
     </div>
   </div>
 
-  <!-- PROFILE -->
+  <!-- ═══ PROFILE ═══ -->
   <div class="page" id="page-profile">
-    <div style="text-align:center;padding:20px 0 24px">
-      <div class="profile-avatar" style="margin:0 auto 12px">A</div>
+    <div class="profile-header">
+      <div class="profile-circle">A</div>
       <div class="profile-name">AI2Work Agent</div>
-      <div class="profile-id" id="profile-agent-id">atlasnexus-tech</div>
+      <div class="profile-handle">atlasnexus.tech</div>
     </div>
-    <div class="card">
-      <div class="setting-item" onclick="switchPage('wallet')">
-        <span class="setting-label">Wallet</span>
-        <span class="setting-value" id="setting-wallet">Not connected</span>
+    <div class="glass-card">
+      <div class="setting-row" onclick="switchPage('wallet')">
+        <span>Wallet</span>
+        <span class="setting-right" id="setting-wallet">Not connected</span>
       </div>
-      <div class="setting-item">
-        <span class="setting-label">Network</span>
-        <span class="setting-value">Celo Mainnet</span>
+      <div class="setting-row">
+        <span>Network</span>
+        <span class="setting-right">Celo Mainnet <span style="width:6px;height:6px;border-radius:50%;background:var(--green)"></span></span>
       </div>
-      <div class="setting-item">
-        <span class="setting-label">Version</span>
-        <span class="setting-value">2.0.0</span>
+      <div class="setting-row" onclick="toggleTheme()">
+        <span>Appearance</span>
+        <span class="setting-right" id="setting-theme">Dark</span>
+      </div>
+      <div class="setting-row">
+        <span>Version</span>
+        <span class="setting-right">3.0.0 — Atlas</span>
       </div>
     </div>
-    <div style="margin-top:20px;text-align:center">
-      <a href="https://github.com/AtlasNexusTech/ai2work-android" style="color:var(--primary);font-size:14px;font-weight:500;text-decoration:none">GitHub →</a>
+    <div style="text-align:center;margin-top:24px">
+      <a href="https://github.com/AtlasNexusTech/ai2work-android" style="color:var(--accent);font-size:14px;font-weight:500;text-decoration:none;letter-spacing:-0.2px">View on GitHub →</a>
     </div>
   </div>
 </main>
 
-<nav id="bottomNav">
-  <div class="nav-item active" data-page="home" onclick="switchPage('home')">
-    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    Home
-  </div>
-  <div class="nav-item" data-page="bounties" onclick="switchPage('bounties')">
-    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-    Bounties
-  </div>
-  <div class="nav-item" data-page="wallet" onclick="switchPage('wallet')">
-    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-    Wallet
-  </div>
-  <div class="nav-item" data-page="profile" onclick="switchPage('profile')">
-    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    Profile
-  </div>
-</nav>
+<div class="nav-container">
+  <nav id="bottomNav">
+    <div class="nav-item active" data-page="home" onclick="switchPage('home')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Home
+    </div>
+    <div class="nav-item" data-page="bounties" onclick="switchPage('bounties')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Bounties
+    </div>
+    <div class="nav-item" data-page="wallet" onclick="switchPage('wallet')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      Wallet
+    </div>
+    <div class="nav-item" data-page="profile" onclick="switchPage('profile')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Profile
+    </div>
+  </nav>
+</div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ── Navigation ──
+// ═══ STATE ═══
 let currentPage = 'home';
+let walletAddress = null;
+let currentTheme = 'dark';
 
+// ═══ MOCK DATA ═══
+const BOUNTIES = [
+  { id:1, title:'Smart Contract Security Audit', amount:250, token:'cUSD', tag:'Solidity', color:'#1e1b4b' },
+  { id:2, title:'Next.js Landing Page & Framer Motion', amount:150, token:'cUSD', tag:'React', color:'#0c1a2a' },
+  { id:3, title:'DeFi Analytics Dashboard', amount:500, token:'CELO', tag:'Data', color:'#1a0e00' },
+  { id:4, title:'ERC-721 Agent Registry Integration', amount:320, token:'USDC', tag:'Web3', color:'#0a1a1a' },
+];
+
+// ═══ NAVIGATION ═══
 function switchPage(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active', 'fade-in');
+  document.getElementById('page-' + page).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.querySelector(`.nav-item[data-page="${page}"]`).classList.add('active');
   currentPage = page;
+  main.scrollTop = 0;
   if (page === 'wallet') refreshWallet();
-  if (page === 'home') loadHomeStats();
-  if (page === 'bounties') loadAllBounties();
+  if (page === 'bounties') renderBounties('all-bounties', BOUNTIES);
+  if (page === 'home') renderBounties('recent-bounties', BOUNTIES.slice(0, 3));
 }
 
-// ── Toast ──
+// ═══ THEME ═══
+function toggleTheme() {
+  currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  localStorage.setItem('ai2work-theme', currentTheme);
+  document.getElementById('setting-theme').textContent = currentTheme === 'dark' ? 'Dark' : 'Light';
+}
+
+// ═══ TOAST ═══
 function toast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-// ── Wallet ──
-let walletAddress = null;
-
+// ═══ WALLET ═══
 async function connectWallet() {
-  if (!window.ethereum) {
-    toast('No wallet found. Install MetaMask or use MiniPay.');
-    return;
-  }
+  if (!window.ethereum) { toast('No wallet detected'); return }
   try {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     walletAddress = accounts[0];
     refreshWallet();
-    toast('Wallet connected');
-  } catch(e) {
-    toast('Connection rejected');
-  }
+    toast('Connected');
+  } catch(e) { toast('Rejected') }
 }
 
 function disconnectWallet() {
@@ -373,15 +522,15 @@ function disconnectWallet() {
 
 function copyAddress() {
   if (!walletAddress) return;
-  navigator.clipboard.writeText(walletAddress).then(() => toast('Address copied'));
+  navigator.clipboard.writeText(walletAddress).then(() => toast('Copied'));
 }
 
 function refreshWallet() {
-  const connected = !!walletAddress;
-  document.getElementById('wallet-connected').style.display = connected ? 'block' : 'none';
-  document.getElementById('wallet-disconnected').style.display = connected ? 'none' : 'block';
-  if (connected) {
-    document.getElementById('bal-address').textContent = walletAddress.slice(0, 8) + '…' + walletAddress.slice(-6);
+  const conn = !!walletAddress;
+  document.getElementById('wallet-connected').style.display = conn ? 'block' : 'none';
+  document.getElementById('wallet-disconnected').style.display = conn ? 'none' : 'block';
+  if (conn) {
+    document.getElementById('bal-address').textContent = walletAddress.slice(0,8) + '…' + walletAddress.slice(-6);
     document.getElementById('setting-wallet').textContent = walletAddress.slice(0,6) + '…' + walletAddress.slice(-4);
     updateBalance();
   } else {
@@ -401,55 +550,40 @@ async function updateBalance() {
   }
 }
 
-// ── Home Stats ──
-function loadHomeStats() {
-  // Mock stats — in production, fetch from contract
-  document.getElementById('stat-bounties').textContent = '3';
-  document.getElementById('stat-volume').textContent = '$420';
-}
-
-// ── Bounties ──
-const MOCK_BOUNTIES = [
-  { id:1, title:'Smart Contract Audit', amount:250, token:'cUSD', tag:'Solidity', color:'#E8F5E9' },
-  { id:2, title:'Next.js Landing Page', amount:150, token:'cUSD', tag:'React', color:'#E8F0FE' },
-  { id:3, title:'DeFi Analytics Dashboard', amount:500, token:'CELO', tag:'Data', color:'#FFF3E0' },
-];
-
+// ═══ BOUNTIES ═══
 function renderBounties(containerId, bounties) {
-  const container = document.getElementById(containerId);
+  const el = document.getElementById(containerId);
   if (!bounties.length) {
-    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-tertiary)">No bounties yet</div>';
+    el.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-tertiary);font-size:14px">No bounties yet</div>';
     return;
   }
-  container.innerHTML = bounties.map(b => `
-    <div class="bounty">
-      <div class="bounty-icon" style="background:${b.color}">${b.tag[0]}</div>
-      <div class="bounty-info">
-        <div class="bounty-title">${b.title}</div>
-        <div class="bounty-meta"><span class="tag tag-blue">${b.tag}</span><span>${b.token}</span></div>
+  el.innerHTML = '<div>' + bounties.map(b => `
+    <div class="bounty-row">
+      <div class="bounty-avatar" style="background:${b.color}">${b.tag[0]}</div>
+      <div class="bounty-body">
+        <div class="bounty-name">${b.title}</div>
+        <div class="bounty-tags">
+          <span class="tag tag-blue">${b.tag}</span>
+          <span style="font-size:11px;color:var(--text-tertiary)">${b.token}</span>
+        </div>
       </div>
-      <div class="bounty-amount">$${b.amount}</div>
+      <div class="bounty-price">$${b.amount}</div>
     </div>
-  `).join('');
+  `).join('') + '</div>';
 }
 
-function loadAllBounties() {
-  renderBounties('all-bounties', MOCK_BOUNTIES);
-}
-
-// ── Init ──
+// ═══ INIT ═══
 (function init() {
-  // Try silent reconnect
+  const saved = localStorage.getItem('ai2work-theme');
+  if (saved) { currentTheme = saved; document.documentElement.setAttribute('data-theme', saved) }
+  document.getElementById('setting-theme').textContent = currentTheme === 'dark' ? 'Dark' : 'Light';
+
   if (window.ethereum) {
     window.ethereum.request({ method: 'eth_accounts' }).then(accounts => {
-      if (accounts.length > 0) {
-        walletAddress = accounts[0];
-        refreshWallet();
-      }
+      if (accounts.length > 0) { walletAddress = accounts[0]; refreshWallet() }
     }).catch(() => {});
   }
-  loadHomeStats();
-  renderBounties('recent-bounties', MOCK_BOUNTIES.slice(0, 2));
+  renderBounties('recent-bounties', BOUNTIES.slice(0, 3));
 })();
 </script>
 
